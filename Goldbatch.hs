@@ -1,16 +1,13 @@
 satisfyGoldbach :: Int -> Bool
-satisfyGoldbach n = even n && isMoreThanTwo n && sumOfTwoPrimes n
+satisfyGoldbach n = even n && isMoreThanTwo n && primeSatisfyTheSum n 2
 
 isMoreThanTwo :: Int -> Bool
 isMoreThanTwo n = n > 2
 
-sumOfTwoPrimes :: Int -> Bool
-sumOfTwoPrimes n = isPrime (primeSatisfyTheSum n 2)
-
-primeSatisfyTheSum :: Int -> Int -> Int
+primeSatisfyTheSum :: Int -> Int -> Bool
 primeSatisfyTheSum n k
-  | n == k = n
-  | isPrime k && isPrime (n - k) && k + (n - k) == n = k
+  | n == k = False
+  | isPrime k && isPrime (n - k) = True
   | otherwise = primeSatisfyTheSum n (k + 1)
 
 isPrime :: Int -> Bool
@@ -27,20 +24,13 @@ divSearch n k
   | otherwise = divSearch n (k + 1)
 
 verifyConjectureTo :: Int -> Bool
-verifyConjectureTo n = verifyEachEven n 4
-
-verifyEachEven :: Int -> Int -> Bool
-verifyEachEven n k
-  | n < 4 = False
-  | odd n = False
-  | n == k = True
-  | satisfyGoldbach k = verifyEachEven n (k + 2)
-  | otherwise = False
+verifyConjectureTo 4 = True
+verifyConjectureTo n = satisfyGoldbach n && verifyConjectureTo (n - 2)
 
 primeDescomposition :: Int -> (Int, Int)
 primeDescomposition n
   | n <= 2 = undefined
-  | otherwise = (primeSatisfyTheSum n 2, n - primeSatisfyTheSum n 2)
+  | otherwise = (primeToSum n 2, n - primeToSum n 2)
 
 descompositionNumber :: Int -> Int
 descompositionNumber n = descompositionCounter n 2 0
@@ -48,5 +38,11 @@ descompositionNumber n = descompositionCounter n 2 0
 descompositionCounter :: Int -> Int -> Int -> Int
 descompositionCounter n k i
   | n == k = i
-  | k == primeSatisfyTheSum n k = descompositionCounter n (k + 1) (i + 1)
+  | k == primeToSum n k = descompositionCounter n (k + 1) (i + 1)
   | otherwise = descompositionCounter n (k + 1) i
+
+primeToSum :: Int -> Int -> Int
+primeToSum n k
+  | n == k = n
+  | isPrime k && isPrime (n - k) = k
+  | otherwise = primeToSum n (k + 1)
